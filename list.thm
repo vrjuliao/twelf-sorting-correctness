@@ -1,0 +1,81 @@
+%
+% After in_ord inserts an element into a sorted list, the list remains sorted.
+%
+inv_sort_thm : sorted L -> in_ord L E L' -> sorted L' -> type.
+%mode inv_sort_thm +D1 +D2 -D3.
+
+inv_sort_thm_nil : inv_sort_thm
+    sorted_nil
+    in_ord_nil
+    sorted_one.
+
+inv_sort_thm_leq : inv_sort_thm 
+    L
+    (in_ord_leq LEQ)
+    (sorted_con L LEQ).
+
+
+%{ 
+{X1:nat} {X2:list} {X3:nat} {X4:list} {X5:sorted (cons X1 X2)}
+{X6:in_ord X2 X3 X4} {X7:grt X3 X1} {X8:sorted (cons X1 X4)}
+   |- inv_sort_thm X5 (in_ord_gth X6 X7) X8.
+}%
+inv_sort_thm_gth_general : inv_sort_thm
+    (sorted_con L _)
+    (in_ord_gth IN_ORD GTH)
+    (sorted_con L' LEQ)
+    <- inv_grt GTH LEQ
+    <- inv_sort_thm L IN_ORD L'.
+
+
+%{
+{X1:nat} {X2:nat} {X3:list} {X4:nat} {X5:list} {X6:sorted (cons X2 X3)}
+{X7:leq X1 X2} {X8:in_ord X3 X4 X5} {X9:grt X4 X2} {X10:grt X4 X1}
+{X11:sorted (cons X1 (cons X2 X5))}
+   |- inv_sort_thm (sorted_con X6 X7) (in_ord_gth (in_ord_gth X8 X9) X10) X11.
+}%
+inv_sort_thm_gth_forward : inv_sort_thm
+    (sorted_con L LEQ)
+    (in_ord_gth IN_ORD _)
+    (sorted_con L' LEQ)
+    <- inv_sort_thm L IN_ORD L'.
+
+%{
+{X1:nat} {X2:nat} {X3:list} {X4:nat} {X5:nat} {X6:list} {X7:sorted (cons X2 X3)}
+{X8:leq X1 X2} {X9:in_ord (cons X2 X3) X4 (cons X5 X6)} {X10:grt X4 X1}
+{X11:sorted (cons X1 (cons X5 X6))}
+   |- inv_sort_thm (sorted_con X7 X8) (in_ord_gth X9 X10) X11.
+}%
+inv_sort_thm_gth_middle : inv_sort_thm
+    (sorted_con L _)
+    (in_ord_gth IN_ORD GTH)
+    (sorted_con L' LEQ)
+    <- inv_grt GTH LEQ
+    <- inv_sort_thm L IN_ORD L'.
+
+
+%{
+{X1:nat} {X2:nat} {X3:grt X2 X1} {X4:sorted (cons X1 (cons X2 nil))}
+   |- inv_sort_thm sorted_one (in_ord_gth in_ord_nil X3) X4
+}%
+inv_sort_thm_gth_one : inv_sort_thm
+    sorted_one
+    (in_ord_gth in_ord_nil GTH)
+    (sorted_con sorted_one LEQ)
+    <- inv_grt GTH LEQ.
+
+
+
+%worlds () (inv_sort_thm _ _ _).
+%total D (inv_sort_thm D _ _).
+
+%
+% 'sort' sorts a list.
+%
+sort_thm : sort L L' -> sorted L' -> type.
+%mode sort_thm +SORT -SORTED.
+
+sort_thm_nil : sort_thm sort_nil sorted_nil.
+
+%worlds () (sort_thm _ _).
+%total D (sort_thm D _).
